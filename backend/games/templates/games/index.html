@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Showcase of Game Projects</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .upload-section {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .upload-section h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px dashed #ddd;
+            border-radius: 5px;
+            background: #f9f9f9;
+            cursor: pointer;
+        }
+        
+        .upload-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+        }
+        
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .upload-btn:active {
+            transform: translateY(0);
+        }
+        
+        .upload-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .games-section {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .games-section h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .game-card {
+            border: 2px solid #eee;
+            border-radius: 8px;
+            padding: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }
+        
+        .game-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .game-card p {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .play-btn {
+            background: #667eea;
+            color: white;
+            padding: 8px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .play-btn:hover {
+            background: #5568d3;
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 Showcase of Game Projects</h1>
+        
+        <div class="upload-section">
+            <h2>Загрузить новую игру</h2>
+            <div id="message" class="message"></div>
+            <form id="uploadForm" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="game_name">Название игры:</label>
+                    <input type="text" id="game_name" name="game_name" placeholder="Введите название игры" required>
+                </div>
+                <div class="form-group">
+                    <label for="description">Описание (необязательно):</label>
+                    <textarea id="description" name="description" placeholder="Краткое описание игры"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="game_archive">Архив с игрой (ZIP):</label>
+                    <input type="file" id="game_archive" name="game_archive" accept=".zip" required>
+                </div>
+                <button type="submit" class="upload-btn" id="uploadBtn">Загрузить игру</button>
+            </form>
+        </div>
+        
+        <div class="games-section">
+            <h2>Доступные игры</h2>
+            {% if games %}
+            <div class="games-grid">
+                {% for game in games %}
+                <div class="game-card">
+                    <h3>{{ game.name }}</h3>
+                    {% if game.description %}
+                    <p>{{ game.description }}</p>
+                    {% else %}
+                    <p>Без описания</p>
+                    {% endif %}
+                    <a href="{% url 'play_game' game.id %}" class="play-btn">Играть</a>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <p>Пока нет загруженных игр. Загрузите первую игру выше!</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <script>
+        const form = document.getElementById('uploadForm');
+        const messageDiv = document.getElementById('message');
+        const uploadBtn = document.getElementById('uploadBtn');
+        
+        function showMessage(text, type) {
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(form);
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = 'Загрузка...';
+            
+            try {
+                const response = await fetch('/upload/', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    showMessage('Игра успешно загружена!', 'success');
+                    form.reset();
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    showMessage(data.error || 'Ошибка при загрузке', 'error');
+                }
+            } catch (error) {
+                showMessage('Ошибка соединения: ' + error.message, 'error');
+            } finally {
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = 'Загрузить игру';
+            }
+        });
+    </script>
+</body>
+</html>
