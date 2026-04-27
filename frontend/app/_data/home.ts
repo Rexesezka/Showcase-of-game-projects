@@ -19,6 +19,7 @@ export type ProjectDetailsData = ProjectCardData & {
   images: string[];
   type: string;
   uploadDate: string;
+  buildUrl: string;
   materials: ProjectMaterial[];
   aboutGame: string[];
   howToPlay: string[];
@@ -41,71 +42,120 @@ export type HomeData = {
   projects: ProjectCardData[];
 };
 
-const filterOptions: FilterOptions = {
-  seasons: ["Весна 2026", "Осень 2025"],
-  sortings: ["По убыванию рейтинга", "По возрастанию рейтинга"],
+type BackendStat = {
+  label: string;
+  value: string;
 };
 
-const stats: StatData[] = [
-  { label: "Сезонов", value: "999" },
-  { label: "Проектов", value: "999" },
-  { label: "Студентов", value: "999" },
-];
+type BackendSeason = {
+  id: number;
+  name: string;
+};
 
-const projects: ProjectCardData[] = Array.from({ length: 12 }, (_, index) => ({
-  id: index + 1,
-  title: "Merge Комбинаторика",
-  score: 80 + ((index * 3) % 21),
-}));
+type BackendProjectCard = {
+  id: number;
+  title: string;
+};
 
-const projectDetails: ProjectDetailsData[] = projects.map((project, index) => ({
-  ...project,
-  subtitle: "Merge Комбинаторика",
-  images: ["/image 117.png", "/image 123.png", "/image 124.png", "/image 125.png", "/image 126.png"],
-  type: "WebGL",
-  uploadDate: "20 дек. 2023 г.",
-  materials: [
-    { label: "Git", href: "https://github.com" },
-    { label: "Figma", href: "https://www.figma.com" },
-    { label: "Дизайн документ", href: "https://example.com/design-doc" },
-  ],
-  aboutGame: [
-    "Основной геймплей игры завязан на использовании merge-механики — совмещение/слияние блоков, для решения комбинаторной задачи, которая является главной целью игрока для продвижения в игре на протяжении 14 уровней.",
-    "В игре есть 3 основных вида блоков:",
-    "— Числовой блок: содержит числовые значения и присвоенную переменную (n,m), на место которой число встанет при слиянии с блоками формул;",
-    "— Арифметический блок: используется для создания числовых блоков, с помощью добавления арифметических операций с числами: деление/умножение, сложение/вычитание;",
-    "— Блок формул: содержит основные формулы комбинаторики: P (перестановки), C (сочетания), A (размещения). Данные блоки могут стать результатом слияния арифметических блоков. Блоки формул также можно соединять с числовыми блоками, числа которых встают на место значений (n,m), к которым они принадлежат.",
-    "После прохождения 14 уровней, вам откроется режим «Испытание», где вы можете проверить свои знания и посоревноваться с другими игроками.",
-  ],
-  howToPlay: [
-    "Основной геймплей игры завязан на использовании merge-механики — совмещение/слияние блоков, для решения комбинаторной задачи, которая является главной целью игрока для продвижения в игре на протяжении 14 уровней.",
-    "В игре есть 3 основных вида блоков:",
-    "— Числовой блок: содержит числовые значения и присвоенную переменную (n,m), на место которой число встанет при слиянии с блоками формул;",
-    "— Арифметический блок: используется для создания числовых блоков, с помощью добавления арифметических операций с числами: деление/умножение, сложение/вычитание;",
-    "— Блок формул: содержит основные формулы комбинаторики: P (перестановки), C (сочетания), A (размещения). Данные блоки могут стать результатом слияния арифметических блоков. Блоки формул также можно соединять с числовыми блоками, числа которых встают на место значений (n,m), к которым они принадлежат.",
-    "После прохождения 14 уровней, вам откроется режим «Испытание», где вы можете проверить свои знания и посоревноваться с другими игроками.",
-  ],
-  team: [
-    { name: "Иванов Иван", role: "Frontend-разработчик" },
-    { name: "Иванов Иван", role: "UX/UI дизайнер" },
-    { name: "Иванов Иван", role: "Backend-разработчик" },
-    { name: "Иванова Инна", role: "Аналитик" },
-  ],
-}));
+type BackendProjectDetails = {
+  id: number;
+  title: string;
+  subtitle: string;
+  uploadDate: string;
+  buildUrl: string;
+  shortDescription: string;
+  fullDescription: string;
+  materials: ProjectMaterial[];
+  images: string[];
+};
 
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const backendBaseUrl = process.env.BACKEND_URL ?? "http://127.0.0.1:8000";
+const defaultImage = "/card-picture.png";
+
+const fallbackHome: HomeData = {
+  filterOptions: {
+    seasons: [],
+    sortings: ["По убыванию рейтинга", "По возрастанию рейтинга"],
+  },
+  stats: [
+    { label: "Сезонов", value: "0" },
+    { label: "Проектов", value: "0" },
+    { label: "Студентов", value: "0" },
+  ],
+  projects: [],
+};
+
+async function fetchJson<T>(path: string): Promise<T> {
+  const response = await fetch(`${backendBaseUrl}${path}`, { cache: "no-store" });
+  if (!response.ok) {
+    throw new Error(`Backend request failed: ${path}`);
+  }
+  return response.json() as Promise<T>;
+}
+
+function scoreFromProjectId(id: number): number {
+  return 75 + (id % 26);
+}
+
+function normalizeImages(images: string[]): string[] {
+  const localImages = images.filter((item) => item.startsWith("/"));
+  return localImages.length > 0 ? localImages : [defaultImage];
+}
+
+function normalizeBuildUrl(buildUrl?: string): string {
+  if (!buildUrl) {
+    return "";
+  }
+  if (buildUrl.startsWith("http://") || buildUrl.startsWith("https://")) {
+    return buildUrl;
+  }
+  return `${backendBaseUrl}${buildUrl}`;
+}
 
 export async function getHomeData(): Promise<HomeData> {
-  await sleep(500);
+  try {
+    const [statsResponse, seasonsResponse, projectsResponse] = await Promise.all([
+      fetchJson<{ stats: BackendStat[] }>("/api/stats/"),
+      fetchJson<{ items: BackendSeason[] }>("/api/seasons/"),
+      fetchJson<{ items: BackendProjectCard[] }>("/api/projects/?sort=updated_desc"),
+    ]);
 
-  return {
-    filterOptions,
-    stats,
-    projects,
-  };
+    return {
+      filterOptions: {
+        seasons: seasonsResponse.items.map((item) => item.name),
+        sortings: ["По убыванию рейтинга", "По возрастанию рейтинга"],
+      },
+      stats: statsResponse.stats,
+      projects: projectsResponse.items.map((project) => ({
+        id: project.id,
+        title: project.title,
+        score: scoreFromProjectId(project.id),
+      })),
+    };
+  } catch {
+    return fallbackHome;
+  }
 }
 
 export async function getProjectById(id: number): Promise<ProjectDetailsData | null> {
-  await sleep(150);
-  return projectDetails.find((project) => project.id === id) ?? null;
+  try {
+    const project = await fetchJson<BackendProjectDetails>(`/api/projects/${id}/`);
+    const score = scoreFromProjectId(project.id);
+    return {
+      id: project.id,
+      title: project.title,
+      subtitle: project.subtitle || project.title,
+      score,
+      images: normalizeImages(project.images ?? []),
+      type: "WebGL",
+      uploadDate: project.uploadDate,
+      buildUrl: normalizeBuildUrl(project.buildUrl),
+      materials: project.materials ?? [],
+      aboutGame: [project.fullDescription || "Описание пока не добавлено."],
+      howToPlay: [project.shortDescription || "Инструкция пока не добавлена."],
+      team: [],
+    };
+  } catch {
+    return null;
+  }
 }

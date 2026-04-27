@@ -2,7 +2,9 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.index, name='index'),
-    path('upload/', views.upload_game, name='upload_game'),
-    path('play/<uuid:game_id>/', views.play_game, name='play_game'),
+    path("api/seasons/", views.seasons_list, name="seasons_list"),
+    path("api/projects/", views.projects_list, name="projects_list"),
+    path("api/projects/<int:project_id>/", views.project_detail, name="project_detail"),
+    path("api/stats/", views.stats, name="stats"),
+    path("api/applications/", views.create_application, name="create_application"),
 ]

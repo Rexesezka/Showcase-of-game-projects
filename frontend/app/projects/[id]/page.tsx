@@ -82,9 +82,24 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           <aside className="space-y-6 p-4">
             <div>
               <h1 className="text-3xl font-semibold text-white">{project.subtitle}</h1>
-              <button className="mt-4 w-full rounded-full bg-[#31B2D3] py-2 text-sm font-semibold text-black transition hover:bg-[#52c2df]" type="button">
-                ИГРАТЬ
-              </button>
+              {project.buildUrl ? (
+                <a
+                  className="mt-4 block w-full rounded-full bg-[#31B2D3] py-2 text-center text-sm font-semibold text-black transition hover:bg-[#52c2df]"
+                  href={project.buildUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  ИГРАТЬ
+                </a>
+              ) : (
+                <button
+                  className="mt-4 w-full cursor-not-allowed rounded-full bg-[#4f6570] py-2 text-sm font-semibold text-black/70"
+                  type="button"
+                  disabled
+                >
+                  БИЛД НЕ ДОБАВЛЕН
+                </button>
+              )}
               <p className="mt-4 text-sm text-white">Тип: {project.type}</p>
               <p className="mt-4 text-sm text-white">Загружено: {project.uploadDate}</p>
             </div>
