@@ -4,4 +4,4 @@ export { default as Hero } from "./Hero";
 export { default as ProjectSection } from "./ProjectSection";
 export { default as CircleArrowIcon } from "./CircleArrowIcon";
 export { default as ProjectImageCarousel } from "./ProjectImageCarousel";
-export { default as ArrowCircleIcon } from "./ArrowCircleIcon";
+export { default as ProjectAside } from "./ProjectAside";

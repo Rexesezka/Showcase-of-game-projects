@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Footer() {
   return (
     <footer className="mt-12 bg-[#2B2B31] py-10">
@@ -29,22 +31,24 @@ export default function Footer() {
               проектов в составе экспертной комиссии. Либо вы можете заказать свой
               проект.
             </p>
-            <a className="mt-4 inline-block text-sm text-white underline-offset-4 hover:underline" href="#">
+            <Link
+              className="mt-4 inline-block text-sm text-white underline-offset-4 hover:underline"
+              href="/experts"
+            >
               Поиск экспертов
-            </a>
+            </Link>
           </div>
         </div>
 
         <div className="mt-9 flex flex-wrap gap-x-6 gap-y-2 text-sm text-white/55">
-          <a className="transition hover:text-white" href="#">
+          <Link className="transition hover:text-white" href="/">
             Витрина проектов
-          </a>
-          <a className="transition hover:text-white" href="#">
+          </Link>
+          <Link className="transition hover:text-white" href="/experts">
             Поиск экспертов
-          </a>
+          </Link>
         </div>
       </div>
-      
     </footer>
   );
 }

@@ -74,11 +74,11 @@ const defaultImage = "/card-picture.png";
 
 const fallbackHome: HomeData = {
   filterOptions: {
-    seasons: [],
+    seasons: ["Весна 2026"],
     sortings: ["По убыванию рейтинга", "По возрастанию рейтинга"],
   },
   stats: [
-    { label: "Сезонов", value: "0" },
+    { label: "Сезонов", value: "1" },
     { label: "Проектов", value: "0" },
     { label: "Студентов", value: "0" },
   ],
@@ -120,17 +120,24 @@ export async function getHomeData(): Promise<HomeData> {
       fetchJson<{ items: BackendProjectCard[] }>("/api/projects/?sort=updated_desc"),
     ]);
 
+    const projects = projectsResponse.items.map((project) => ({
+      id: project.id,
+      title: project.title,
+      score: scoreFromProjectId(project.id),
+    }));
+
     return {
       filterOptions: {
-        seasons: seasonsResponse.items.map((item) => item.name),
+        seasons:
+          seasonsResponse.items.length > 0
+            ? seasonsResponse.items.map((item) => item.name)
+            : fallbackHome.filterOptions.seasons,
         sortings: ["По убыванию рейтинга", "По возрастанию рейтинга"],
       },
-      stats: statsResponse.stats,
-      projects: projectsResponse.items.map((project) => ({
-        id: project.id,
-        title: project.title,
-        score: scoreFromProjectId(project.id),
-      })),
+      stats: statsResponse.stats.some((item) => item.value !== "0")
+        ? statsResponse.stats
+        : fallbackHome.stats,
+      projects,
     };
   } catch {
     return fallbackHome;

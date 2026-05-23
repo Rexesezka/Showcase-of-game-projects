@@ -1,0 +1,130 @@
+.experts-games-stage {
+  position: relative;
+  width: min(100%, 700px);
+  height: min(calc(92vw * 9 / 16), 236px);
+  margin: 0 auto;
+}
+
+.experts-games-side {
+  position: absolute;
+  top: 50%;
+  width: min(78vw, 360px);
+  z-index: 1;
+  transform-origin: center center;
+  opacity: 0.6;
+  filter: brightness(0.5);
+  pointer-events: none;
+}
+
+.experts-games-side--left {
+  left: 0;
+  transform: translateY(-50%) translateX(-44px) scale(0.82);
+}
+
+.experts-games-side--right {
+  right: 0;
+  transform: translateY(-50%) translateX(44px) scale(0.82);
+}
+
+.experts-games-center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 10;
+  width: min(92vw, 420px);
+  transform: translate(-50%, -50%);
+}
+
+.experts-games-nav {
+  position: absolute;
+  top: 50%;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateY(-50%);
+}
+
+.experts-games-nav--prev {
+  right: calc(50% + min(46vw, 210px) + 0.75rem);
+  left: auto;
+}
+
+.experts-games-nav--next {
+  left: calc(50% + min(46vw, 210px) + 0.75rem);
+  right: auto;
+}
+
+.experts-games-nav:hover {
+  transform: translateY(-50%) scale(1.05);
+}
+
+.experts-games-card {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #141424;
+  box-shadow: 0 18px 35px rgba(0, 0, 0, 0.35);
+  transition: border-color 0.3s ease;
+}
+
+.experts-games-card:hover {
+  border-color: rgba(103, 232, 249, 0.35);
+}
+
+.experts-games-card--center {
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
+}
+
+.experts-games-card-body {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  background: linear-gradient(to bottom right, #5b2d82, #3d2060, #1a1230);
+}
+
+.experts-games-card-body::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.18), transparent 55%);
+}
+
+.experts-games-center-content {
+  animation: experts-center-enter 0.35s ease;
+}
+
+.experts-games-center-content--next {
+  animation-name: experts-center-enter-next;
+}
+
+.experts-games-center-content--prev {
+  animation-name: experts-center-enter-prev;
+}
+
+@keyframes experts-center-enter-next {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes experts-center-enter-prev {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

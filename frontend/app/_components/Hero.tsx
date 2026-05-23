@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { StatData } from "../_data/home";
 
 type HeroProps = {
@@ -68,12 +69,12 @@ export default function Hero({ stats }: HeroProps) {
                   "linear-gradient(150.37deg, #8FD1E7 18.13%, #61B6CB 50%, #5FA8D3 81.87%)",
               }}
             />
-            <button
-              className="relative z-10 rounded-full bg-[#1F1F1F4D] px-12 py-3 text-sm font-medium text-white transition group-hover:bg-transparent group-hover:text-black"
-              type="button"
+            <Link
+              className="relative z-10 block rounded-full bg-[#1F1F1F4D] px-12 py-3 text-sm font-medium text-white transition group-hover:bg-transparent group-hover:text-black"
+              href="/experts#apply"
             >
               Участвовать
-            </button>
+            </Link>
           </div>
         </div>
 
