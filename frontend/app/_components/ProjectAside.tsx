@@ -70,20 +70,26 @@ export default function ProjectAside({ project, showPlayButton = true }: Project
         </div>
       ) : null}
 
-      <div>
-        <h2 className="mt-10 text-xl font-semibold text-white">О команде</h2>
-        <p className="mt-2 text-lg font-semibold text-white/85">Название команды</p>
-        <ul className="mt-3 space-y-2 text-sm text-white/70">
-          {project.team.map((member) => (
-            <li key={`${member.name}-${member.role}`} className="text-[#A2EBFF]">
-              <p className="text-white/90">{member.name}</p>
-              <p className="inline-flex items-center gap-2">
-                <DropIcon /> {member.role}
-              </p>
-            </li>
-          ))}
-        </ul>
-      </div>
+      {project.teamName || project.team.length > 0 ? (
+        <div>
+          <h2 className="mt-10 text-xl font-semibold text-white">О команде</h2>
+          {project.teamName ? (
+            <p className="mt-2 text-lg font-semibold text-white/85">{project.teamName}</p>
+          ) : null}
+          {project.team.length > 0 ? (
+            <ul className="mt-3 space-y-2 text-sm text-white/70">
+              {project.team.map((member) => (
+                <li key={`${member.name}-${member.role}`} className="text-[#A2EBFF]">
+                  <p className="text-white/90">{member.name}</p>
+                  <p className="inline-flex items-center gap-2">
+                    <DropIcon /> {member.role}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
+      ) : null}
     </aside>
   );
 }

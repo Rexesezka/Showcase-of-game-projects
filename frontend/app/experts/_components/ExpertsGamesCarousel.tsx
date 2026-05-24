@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ArrowCircleIcon from "../../_components/ArrowCircleIcon";
+import ProjectCoverImage from "../../_components/ProjectCoverImage";
 import type { ProjectCardData } from "../../_data/home";
 import "./ExpertsGamesCarousel.css";
 
@@ -30,7 +31,15 @@ function GameCard({ project, variant, animationDirection }: GameCardProps) {
           ? `experts-games-card-body experts-games-center-content experts-games-center-content--${animationDirection ?? "next"}`
           : "experts-games-card-body"
       }
-    />
+    >
+      <ProjectCoverImage
+        alt={project.title}
+        className="object-cover"
+        fill
+        sizes="(max-width: 640px) 92vw, 420px"
+        src={project.coverImage}
+      />
+    </div>
   );
 
   if (isCenter) {
@@ -49,7 +58,7 @@ function GameCard({ project, variant, animationDirection }: GameCardProps) {
 }
 
 export default function ExpertsGamesCarousel({ projects }: ExpertsGamesCarouselProps) {
-  const items = projects.slice(0, 6);
+  const items = projects.slice(0, 5);
   const [activeIndex, setActiveIndex] = useState(0);
   const [direction, setDirection] = useState<"next" | "prev">("next");
 
@@ -59,6 +68,19 @@ export default function ExpertsGamesCarousel({ projects }: ExpertsGamesCarouselP
 
   const showSides = items.length > 1;
   const prevIndex = wrapIndex(activeIndex - 1, items.length);
+
+  useEffect(() => {
+    if (items.length <= 1) {
+      return;
+    }
+
+    const timer = window.setInterval(() => {
+      setDirection("next");
+      setActiveIndex((index) => wrapIndex(index + 1, items.length));
+    }, 4500);
+
+    return () => window.clearInterval(timer);
+  }, [items.length]);
   const nextIndex = wrapIndex(activeIndex + 1, items.length);
   const activeProject = items[activeIndex];
 

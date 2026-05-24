@@ -83,14 +83,7 @@
   position: relative;
   height: 100%;
   overflow: hidden;
-  background: linear-gradient(to bottom right, #5b2d82, #3d2060, #1a1230);
-}
-
-.experts-games-card-body::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.18), transparent 55%);
+  background: #141424;
 }
 
 .experts-games-center-content {

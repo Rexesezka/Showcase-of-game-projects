@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Footer, Header } from "../_components";
 import { faqItems, participationSteps, whyCards } from "../_data/experts";
-import { getHomeData } from "../_data/home";
+import { getTopProjects } from "../_data/home";
 import ExpertApplicationForm from "./_components/ExpertApplicationForm";
 import ExpertsGamesCarousel from "./_components/ExpertsGamesCarousel";
 
@@ -52,7 +52,7 @@ function StepArrowDown() {
 }
 
 export default async function ExpertsPage() {
-  const homeData = await getHomeData();
+  const topProjects = await getTopProjects(5);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -129,7 +129,7 @@ export default async function ExpertsPage() {
               </div>
             </div>
 
-            <ExpertsGamesCarousel projects={homeData.projects} />
+            <ExpertsGamesCarousel projects={topProjects} />
           </div>
         </section>
 

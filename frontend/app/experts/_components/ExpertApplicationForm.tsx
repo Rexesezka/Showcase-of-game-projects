@@ -71,6 +71,8 @@ function FormField({
 
 export default function ExpertApplicationForm() {
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
   const [errors, setErrors] = useState<Partial<Record<RequiredField, boolean>>>({});
 
   function setFieldError(name: RequiredField, hasError: boolean) {
@@ -93,8 +95,9 @@ export default function ExpertApplicationForm() {
     }
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setSubmitError("");
 
     const formData = new FormData(event.currentTarget);
     const requiredFields: RequiredField[] = [
@@ -119,7 +122,36 @@ export default function ExpertApplicationForm() {
       return;
     }
 
-    setSubmitted(true);
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch("/api/applications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName: String(formData.get("firstName") ?? "").trim(),
+          lastName: String(formData.get("lastName") ?? "").trim(),
+          middleName: String(formData.get("middleName") ?? "").trim(),
+          company: String(formData.get("company") ?? "").trim(),
+          position: String(formData.get("position") ?? "").trim(),
+          contactDetails: String(formData.get("contactDetails") ?? "").trim(),
+          comment: String(formData.get("comment") ?? "").trim(),
+        }),
+      });
+
+      const data = (await response.json()) as { error?: string };
+
+      if (!response.ok) {
+        setSubmitError(data.error ?? "Не удалось отправить заявку. Попробуйте позже.");
+        return;
+      }
+
+      setSubmitted(true);
+    } catch {
+      setSubmitError("Не удалось отправить заявку. Попробуйте позже.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   if (submitted) {
@@ -189,12 +221,15 @@ export default function ExpertApplicationForm() {
         type="textarea"
       />
 
+      {submitError ? <p className="text-center text-sm text-red-400">{submitError}</p> : null}
+
       <div className="mt-2 flex justify-center">
         <button
-          className="rounded-full bg-[#FFE278] px-12 py-3 text-sm font-semibold uppercase tracking-wide text-[#262526] transition hover:bg-[#ffd95a]"
+          className="rounded-full bg-[#FFE278] px-12 py-3 text-sm font-semibold uppercase tracking-wide text-[#262526] transition hover:bg-[#ffd95a] disabled:cursor-not-allowed disabled:opacity-60"
+          disabled={isSubmitting}
           type="submit"
         >
-          Отправить
+          {isSubmitting ? "Отправка..." : "Отправить"}
         </button>
       </div>
     </form>

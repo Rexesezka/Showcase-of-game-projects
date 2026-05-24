@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { useId, useState } from "react";
 import ArrowCircleIcon from "./ArrowCircleIcon";
+import ProjectCoverImage from "./ProjectCoverImage";
 import { FreeMode, Navigation, Pagination, Thumbs } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -35,14 +35,13 @@ export default function ProjectImageCarousel({ title, images }: ProjectImageCaro
           {images.map((src, index) => (
             <SwiperSlide key={`${src}-${index}`}>
               <div className="relative h-full w-full">
-                <Image
-                  src={src}
+                <ProjectCoverImage
                   alt={title}
+                  className="object-cover"
                   fill
                   priority={index === 0}
-                  loading={index === 0 ? "eager" : "lazy"}
-                  className="object-cover"
                   sizes="(max-width: 1024px) 100vw, 66vw"
+                  src={src}
                 />
               </div>
             </SwiperSlide>
@@ -77,13 +76,13 @@ export default function ProjectImageCarousel({ title, images }: ProjectImageCaro
         {images.map((src, index) => (
           <SwiperSlide key={`${src}-${index}`}>
             <div className="relative aspect-[16/8] w-full cursor-pointer overflow-hidden border border-white/20">
-              <Image
-                src={src}
+              <ProjectCoverImage
                 alt={`${title} preview ${index + 1}`}
-                fill
-                loading={index === 0 ? "eager" : "lazy"}
                 className="object-cover"
+                fill
+                priority={index === 0}
                 sizes="(max-width: 1024px) 25vw, 12vw"
+                src={src}
               />
             </div>
           </SwiperSlide>

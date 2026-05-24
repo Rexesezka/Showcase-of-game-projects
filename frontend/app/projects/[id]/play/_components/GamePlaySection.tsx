@@ -47,9 +47,28 @@ function OutlineActionButton({
   );
 }
 
+type LoadState = "loading" | "ready" | "error";
+
 export default function GamePlaySection({ project }: GamePlaySectionProps) {
   const gameRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [loadState, setLoadState] = useState<LoadState>("loading");
+
+  useEffect(() => {
+    setLoadState("loading");
+  }, [project.buildUrl]);
+
+  useEffect(() => {
+    if (loadState !== "loading") {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setLoadState((current) => (current === "loading" ? "ready" : current));
+    }, 10000);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [loadState, project.buildUrl]);
 
   useEffect(() => {
     function handleFullscreenChange() {
@@ -110,11 +129,38 @@ export default function GamePlaySection({ project }: GamePlaySectionProps) {
         }`}
       >
         <div
-          className={`flex w-full items-center justify-center bg-gradient-to-br from-[#2a2a34] via-[#1a1a22] to-[#121218] ${
+          className={`relative w-full bg-black ${
             isFullscreen ? "min-h-screen" : "aspect-video"
           }`}
         >
-          <p className="text-sm text-white/45">Здесь будет запущена игра</p>
+          {loadState === "loading" ? (
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-gradient-to-br from-[#2a2a34] via-[#1a1a22] to-[#121218]">
+              <div
+                aria-hidden
+                className="h-12 w-12 animate-spin rounded-full border-4 border-white/20 border-t-white"
+              />
+              <p className="text-sm text-white/60">Загрузка игры...</p>
+            </div>
+          ) : null}
+
+          {loadState === "error" ? (
+            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#2a2a34] via-[#1a1a22] to-[#121218] p-6 text-center">
+              <p className="text-sm text-red-300">
+                Ошибка загрузки игры. Убедитесь, что архив содержит корректный Unity WebGL билд.
+              </p>
+            </div>
+          ) : null}
+
+          <iframe
+            allow="fullscreen"
+            className={`h-full w-full border-0 ${
+              loadState === "ready" ? "block" : "hidden"
+            }`}
+            onError={() => setLoadState("error")}
+            onLoad={() => setLoadState("ready")}
+            src={project.buildUrl}
+            title={`Игра: ${project.title}`}
+          />
         </div>
       </div>
     </div>

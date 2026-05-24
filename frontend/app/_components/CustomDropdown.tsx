@@ -2,14 +2,21 @@
 
 import { useEffect, useRef, useState } from "react";
 
-type CustomDropdownProps = {
-  options: string[];
+export type DropdownOption = {
+  value: string;
   label: string;
 };
 
-export default function CustomDropdown({ options, label }: CustomDropdownProps) {
+type CustomDropdownProps = {
+  options: DropdownOption[];
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+};
+
+export default function CustomDropdown({ options, label, value, onChange }: CustomDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [selected, setSelected] = useState(options[0] ?? "");
+  const selectedLabel = options.find((option) => option.value === value)?.label ?? "";
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerBaseClass =
     "flex h-[50px] w-full items-center justify-center gap-5 rounded-[28px] border border-white/80 bg-[#565656CC] px-5 text-m text-white shadow-[inset_0_0_68px_0_rgba(255,255,255,0.05),inset_0_4px_4px_0_rgba(255,255,255,0.15)] backdrop-blur-xl";
@@ -48,7 +55,7 @@ export default function CustomDropdown({ options, label }: CustomDropdownProps) 
         onClick={() => setIsOpen(true)}
       >
         <span className="absolute left-1/2 -translate-x-1/2 whitespace-nowrap">
-         {label} {selected}
+         {label} {selectedLabel}
         </span>
         <svg
           aria-hidden
@@ -70,7 +77,7 @@ export default function CustomDropdown({ options, label }: CustomDropdownProps) 
             onClick={() => setIsOpen(false)}
           >
             <span className="absolute left-1/2 -translate-x-1/2 whitespace-nowrap">
-              {label} {selected}
+              {label} {selectedLabel}
             </span>
             <svg
               aria-hidden
@@ -88,20 +95,20 @@ export default function CustomDropdown({ options, label }: CustomDropdownProps) 
             role="listbox"
           >
             {options.map((option, index) => (
-              <li key={option} className={index > 0 ? "border-t border-[#8C8C8C80]" : ""}>
+              <li key={option.value} className={index > 0 ? "border-t border-[#8C8C8C80]" : ""}>
                 <button
-                  aria-selected={selected === option}
+                  aria-selected={value === option.value}
                   className={`w-full whitespace-nowrap py-1 text-m transition ${
-                    selected === option ? "text-[#FFE278]" : "text-white/95 hover:text-white"
+                    value === option.value ? "text-[#FFE278]" : "text-white/95 hover:text-white"
                   }`}
                   role="option"
                   type="button"
                   onClick={() => {
-                    setSelected(option);
+                    onChange(option.value);
                     setIsOpen(false);
                   }}
                 >
-                  {option}
+                  {option.label}
                 </button>
               </li>
             ))}

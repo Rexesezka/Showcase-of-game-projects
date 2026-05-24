@@ -11,8 +11,8 @@ export default async function Home() {
         <Hero stats={homeData.stats} />
         <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
           <ProjectSection
-            filterOptions={homeData.filterOptions}
-            projects={homeData.projects}
+            seasons={homeData.filterOptions.seasons}
+            initialProjects={homeData.projects}
           />
         </div>
       </main>
