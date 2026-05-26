@@ -49,7 +49,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             <ProjectImageCarousel title={project.title} images={project.images} />
 
             <article className="mt-5 rounded-2xl bg-white/[0.03] p-5 text-white/70">
-              <h2 className="text-xl font-semibold text-[#FFD76A]">Описание игры</h2>
+              <h2 className="text-xl font-semibold text-[#FFE278]">Описание игры</h2>
               <div className="mt-3 space-y-3 text-sm leading-relaxed">
                 {project.aboutGame.map((paragraph) => (
                   <p key={paragraph}>{paragraph}</p>
@@ -58,7 +58,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             </article>
 
             <article className="mt-5 rounded-2xl bg-white/[0.03] p-5 text-white/70">
-              <h2 className="text-xl font-semibold text-[#FFD76A]">Как играть</h2>
+              <h2 className="text-xl font-semibold text-[#FFE278]">Как играть</h2>
               <div className="mt-3 space-y-3 text-sm leading-relaxed">
                 {project.howToPlay.map((paragraph) => (
                   <p key={paragraph}>{paragraph}</p>

@@ -11,11 +11,11 @@ export default function Hero({ stats }: HeroProps) {
       <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-b-[24px]">
         <div
           className="absolute left-[24%] bottom-[28%] h-72 w-72 rounded-full"
-          style={{ backgroundColor: "#E87E00", filter: "blur(200px)", opacity: 1 }}
+          style={{ backgroundColor: "#FFE278", filter: "blur(200px)", opacity: 1 }}
         />
         <div
           className="absolute right-[24%] bottom-[28%] h-72 w-72 rounded-full"
-          style={{ backgroundColor: "#E87E00", filter: "blur(200px)", opacity: 1 }}
+          style={{ backgroundColor: "#FFE278", filter: "blur(200px)", opacity: 1 }}
         />
         <div
           className="absolute left-[18%] top-[-6%] h-72 w-72 rounded-full"

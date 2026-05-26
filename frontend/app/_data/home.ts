@@ -218,6 +218,12 @@ export async function getProjectById(id: number): Promise<ProjectDetailsData | n
       title: project.title,
       subtitle: project.subtitle || project.title,
       score: normalizeScore(project.score, project.id),
+      coverImage: resolveCoverImage({
+        id: project.id,
+        title: project.title,
+        score: project.score,
+        images: project.images,
+      }),
       images: normalizeImages(project.images ?? []),
       type: "WebGL",
       uploadDate: project.uploadDate,

@@ -1,8 +1,12 @@
 import Link from "next/link";
 
-export default function Footer() {
+type FooterProps = {
+  className?: string;
+};
+
+export default function Footer({ className = "mt-12" }: FooterProps) {
   return (
-    <footer className="mt-12 bg-[#2B2B31] py-10">
+    <footer className={`bg-[#2B2B31] py-10 ${className}`.trim()}>
       <div className="mx-auto w-full max-w-5xl px-4 sm:px-6">
         <div className="grid gap-8 text-white/75 sm:grid-cols-3">
           <div>

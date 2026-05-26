@@ -156,7 +156,7 @@ export default function ExpertApplicationForm() {
 
   if (submitted) {
     return (
-      <div className="mx-auto max-w-xl rounded-2xl border border-[#FFE278]/30 bg-white/[0.03] p-8 text-center">
+      <div className="mx-auto max-w-xl p-8 text-center">
         <p className="text-lg font-semibold text-[#FFE278]">Заявка отправлена</p>
         <p className="mt-3 text-sm text-white/70">
           Спасибо! Мы свяжемся с вами после рассмотрения заявки.
@@ -225,7 +225,7 @@ export default function ExpertApplicationForm() {
 
       <div className="mt-2 flex justify-center">
         <button
-          className="rounded-full bg-[#FFE278] px-12 py-3 text-sm font-semibold uppercase tracking-wide text-[#262526] transition hover:bg-[#ffd95a] disabled:cursor-not-allowed disabled:opacity-60"
+          className="rounded-full bg-[#FFE278] px-12 py-3 text-sm font-semibold uppercase tracking-wide text-[#262526] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60"
           disabled={isSubmitting}
           type="submit"
         >

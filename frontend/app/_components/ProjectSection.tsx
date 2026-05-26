@@ -68,7 +68,7 @@ export default function ProjectSection({ seasons, initialProjects }: ProjectSect
   return (
     <section className="mx-auto mt-14 max-w-5xl">
       <h2 className="text-center text-3xl font-semibold tracking-tight text-white">
-        Игровые проекты. <span className="text-yellow-300">Весна 2026</span>
+        Игровые проекты. <span className="text-[#FFE278]">Весна 2026</span>
       </h2>
       <p className="mt-2 text-center text-sm text-white/65">
         {isLoading ? "Загрузка..." : `Найдено проектов: ${projects.length}`}

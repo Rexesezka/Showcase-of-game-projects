@@ -5,6 +5,7 @@ import { faqItems, participationSteps, whyCards } from "../_data/experts";
 import { getTopProjects } from "../_data/home";
 import ExpertApplicationForm from "./_components/ExpertApplicationForm";
 import ExpertsGamesCarousel from "./_components/ExpertsGamesCarousel";
+import OrganizersQuestionForm from "./_components/OrganizersQuestionForm";
 
 export const metadata: Metadata = {
   title: "Экспертам | Project Showcase",
@@ -57,16 +58,16 @@ export default async function ExpertsPage() {
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
-      <main className="flex-1 pb-10 sm:pb-20">
+      <main className="flex flex-1 flex-col">
         <section className="relative isolate overflow-x-clip rounded-b-[24px] border-b border-white/10 bg-[#5656564D] px-5 pb-10 pt-20 sm:px-10 sm:pt-24">
           <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-b-[24px]">
             <div
               className="absolute left-[24%] bottom-[28%] h-72 w-72 rounded-full"
-              style={{ backgroundColor: "#E87E00", filter: "blur(200px)", opacity: 1 }}
+              style={{ backgroundColor: "#FFE278", filter: "blur(200px)", opacity: 1 }}
             />
             <div
               className="absolute right-[24%] bottom-[28%] h-72 w-72 rounded-full"
-              style={{ backgroundColor: "#E87E00", filter: "blur(200px)", opacity: 1 }}
+              style={{ backgroundColor: "#FFE278", filter: "blur(200px)", opacity: 1 }}
             />
             <div
               className="absolute left-[18%] top-[-6%] h-72 w-72 rounded-full"
@@ -84,8 +85,8 @@ export default async function ExpertsPage() {
               <span className="mt-1 block text-[#FFE278]">студенческих игровых проектов</span>
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-white/65 sm:text-base">
-              Делитесь опытом с командами студентов, участвуйте в защите проектов и помогайте
-              формировать новое поколение разработчиков игр.
+              Участвуйте в защите проектов студентов ИРИТ-РТФ УрФУ, делитесь опытом с начинающими
+              разработчиками и находите перспективные команды.
             </p>
 
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
@@ -94,7 +95,7 @@ export default async function ExpertsPage() {
                 href="#apply"
                 style={{
                   background:
-                    "linear-gradient(180deg, #FFFEA9 -40.62%, #2FD6FF 45.63%, #2797D9 161.34%)",
+                    "linear-gradient(180deg, #FFE278 -40.62%, #2FD6FF 45.63%, #2797D9 161.34%)",
                 }}
               >
                 Стать экспертом
@@ -205,18 +206,20 @@ export default async function ExpertsPage() {
           <h2 className="text-center text-3xl font-semibold text-[#A2EBFF] sm:text-4xl">
             Часто задаваемые вопросы
           </h2>
-          <div className="mt-10 space-y-3">
+          <div className="mt-10 space-y-4">
             {faqItems.map((item, index) => (
               <details
                 key={item.question}
-                className="group rounded-2xl bg-[#5656564D] shadow-[inset_0_0_68px_0_rgba(255,255,255,0.05),inset_0_4px_4px_0_rgba(255,255,255,0.15)] backdrop-blur-xl"
+                className="faq-details group rounded-2xl border border-white bg-[#3F3F3F4D]"
                 open={index === 0}
               >
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 text-sm font-medium text-white sm:text-base [&::-webkit-details-marker]:hidden">
+                <summary className="flex min-h-10 cursor-pointer list-none items-center justify-between gap-3 py-2.5 pl-10 pr-10 text-sm font-medium text-white [&::-webkit-details-marker]:hidden">
                   {item.question}
-                  <ChevronIcon />
+                  <span className="faq-chevron shrink-0">
+                    <ChevronIcon />
+                  </span>
                 </summary>
-                <p className="border-t border-white/10 px-5 pb-4 pt-3 text-sm leading-relaxed text-white/65">
+                <p className="border-t border-white/10 pb-2.5 pl-10 pr-10 pt-2 text-sm leading-snug text-white/65">
                   {item.answer}
                 </p>
               </details>
@@ -224,20 +227,24 @@ export default async function ExpertsPage() {
           </div>
         </section>
 
-        <section
-          id="apply"
-          className="scroll-mt-28 mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-12"
-        >
-          <h2 className="text-center text-3xl font-semibold sm:text-4xl">
-            <span className="text-white">Форма заявки: </span>
-            <span className="text-[#FFE278]">Стать экспертом</span>
-          </h2>
-          <div className="mt-10">
-            <ExpertApplicationForm />
-          </div>
-        </section>
+        <OrganizersQuestionForm />
+
+        <div className="glass-panel flex flex-1 flex-col w-full pt-8 sm:pt-12">
+          <section
+            id="apply"
+            className="scroll-mt-28 mx-auto w-full max-w-6xl flex-1 px-4 pb-12 sm:px-6 sm:pb-16"
+          >
+            <h2 className="text-center text-3xl font-semibold sm:text-4xl">
+              <span className="text-white">Форма заявки: </span>
+              <span className="text-[#FFE278]">Стать экспертом</span>
+            </h2>
+            <div className="mt-10">
+              <ExpertApplicationForm />
+            </div>
+          </section>
+        </div>
       </main>
-      <Footer />
+      <Footer className="mt-0" />
     </div>
   );
 }
