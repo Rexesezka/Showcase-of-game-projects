@@ -37,7 +37,29 @@ function buildContactHref(channel: ContactChannel, question: string): string {
   }
 
   if (channel === "telegram") {
+    try {
+      const telegramUrl = new URL(organizerContacts.telegram);
+      const username = telegramUrl.pathname.replace(/\//g, "");
+      if (username) {
+        return `https://t.me/${username}?text=${encodedText}`;
+      }
+    } catch {
+      // Fallback to share URL
+    }
+
     return `https://t.me/share/url?text=${encodedText}`;
+  }
+
+  try {
+    const vkUrl = new URL(organizerContacts.vk);
+    const profile = vkUrl.pathname.replace(/\//g, "");
+    if (profile) {
+      const idMatch = profile.match(/^id(\d+)$/i);
+      const peer = idMatch ? idMatch[1] : profile;
+      return `https://vk.com/im?sel=${encodeURIComponent(peer)}&text=${encodedText}`;
+    }
+  } catch {
+    // Fallback to share URL
   }
 
   return `https://vk.com/share.php?comment=${encodedText}`;
@@ -45,7 +67,7 @@ function buildContactHref(channel: ContactChannel, question: string): string {
 
 type ContactButtonProps = {
   channel: ContactChannel;
-  href: string;
+  question: string;
   label: string;
 };
 
@@ -56,7 +78,25 @@ const gradientBorderStyle = {
   maskComposite: "exclude",
 } as const;
 
-function ContactButton({ channel, href, label }: ContactButtonProps) {
+function ContactButton({ channel, question, label }: ContactButtonProps) {
+  const href = buildContactHref(channel, question);
+
+  async function handleClick() {
+    const text = (question.trim() || "Вопрос организаторам").trim();
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      // Clipboard can be unavailable in some browsers.
+    }
+
+    if (channel === "email") {
+      window.location.href = href;
+      return;
+    }
+
+    window.open(href, "_blank", "noopener,noreferrer");
+  }
+
   return (
     <div className="group relative inline-block min-w-[9.5rem] rounded-full">
       <span
@@ -69,15 +109,14 @@ function ContactButton({ channel, href, label }: ContactButtonProps) {
         className="pointer-events-none absolute inset-0 rounded-full opacity-0 transition-opacity group-hover:opacity-100"
         style={{ background: gradientBorderStyle.background }}
       />
-      <a
-        className="relative z-10 flex items-center justify-center gap-2 rounded-full bg-[#1F1F1F4D] px-5 py-2.5 text-sm font-medium text-white transition group-hover:bg-transparent group-hover:text-black"
-        href={href}
-        rel={channel === "email" ? undefined : "noopener noreferrer"}
-        target={channel === "email" ? undefined : "_blank"}
+      <button
+        className="relative z-10 flex w-full items-center justify-center gap-2 rounded-full bg-[#1F1F1F4D] px-5 py-2.5 text-sm font-medium text-white transition group-hover:bg-transparent group-hover:text-black"
+        onClick={handleClick}
+        type="button"
       >
         <ContactIcon channel={channel} />
         {label}
-      </a>
+      </button>
     </div>
   );
 }
@@ -106,21 +145,9 @@ export default function OrganizersQuestionForm() {
 
         <p className="mt-6 text-left text-sm text-white/80">Отправить через:</p>
         <div className="mt-4 flex flex-wrap justify-center gap-3">
-          <ContactButton
-            channel="telegram"
-            href={buildContactHref("telegram", question)}
-            label="Telegram"
-          />
-          <ContactButton
-            channel="vk"
-            href={buildContactHref("vk", question)}
-            label="Вконтакте"
-          />
-          <ContactButton
-            channel="email"
-            href={buildContactHref("email", question)}
-            label="Email"
-          />
+          <ContactButton channel="telegram" label="Telegram" question={question} />
+          <ContactButton channel="vk" label="Вконтакте" question={question} />
+          <ContactButton channel="email" label="Email" question={question} />
         </div>
       </div>
     </section>

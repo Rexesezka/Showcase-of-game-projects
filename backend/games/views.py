@@ -100,9 +100,10 @@ def projects_list(request):
     projects = _projects_queryset()
     if season_id and season_id.isdigit():
         projects = projects.filter(season_id=int(season_id))
+    total = projects.count()
     projects = projects.order_by(order_by, "-id")
 
-    return JsonResponse({"items": [_serialize_project_card(project) for project in projects]})
+    return JsonResponse({"items": [_serialize_project_card(project) for project in projects], "total": total})
 
 
 @require_GET

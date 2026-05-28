@@ -21,6 +21,7 @@ export default function ProjectSection({ seasons, initialProjects }: ProjectSect
   const [sort, setSort] = useState("score_desc");
   const [seasonId, setSeasonId] = useState("");
   const [projects, setProjects] = useState(initialProjects);
+  const [projectsTotal, setProjectsTotal] = useState(initialProjects.length);
   const [isLoading, setIsLoading] = useState(false);
 
   const seasonOptions: DropdownOption[] = [
@@ -42,16 +43,22 @@ export default function ProjectSection({ seasons, initialProjects }: ProjectSect
         if (!response.ok) {
           throw new Error("Failed to load projects");
         }
-        return response.json() as Promise<{ items: Parameters<typeof mapProjectCards>[0] }>;
+        return response.json() as Promise<{
+          items: Parameters<typeof mapProjectCards>[0];
+          total?: number;
+        }>;
       })
       .then((data) => {
         if (!cancelled) {
-          setProjects(mapProjectCards(data.items));
+          const mappedProjects = mapProjectCards(data.items);
+          setProjects(mappedProjects);
+          setProjectsTotal(typeof data.total === "number" ? data.total : mappedProjects.length);
         }
       })
       .catch(() => {
         if (!cancelled) {
           setProjects([]);
+          setProjectsTotal(0);
         }
       })
       .finally(() => {
@@ -71,7 +78,7 @@ export default function ProjectSection({ seasons, initialProjects }: ProjectSect
         Игровые проекты. <span className="text-[#FFE278]">Весна 2026</span>
       </h2>
       <p className="mt-2 text-center text-sm text-white/65">
-        {isLoading ? "Загрузка..." : `Найдено проектов: ${projects.length}`}
+        {isLoading ? "Загрузка..." : `Найдено проектов: ${projectsTotal}`}
       </p>
 
       <div className="mx-auto mt-6 flex flex-col items-center justify-center gap-3 text-center sm:flex-row sm:justify-center">

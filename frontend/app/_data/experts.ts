@@ -96,7 +96,7 @@ export const faqItems: FaqItem[] = [
 ];
 
 export const organizerContacts = {
-  email: "test@gmail.com",
-  telegram: "https://t.me/",
-  vk: "https://vk.com/",
+  email: "chumeicko1@yandex.ru",
+  telegram: "https://t.me/rexesez",
+  vk: "https://vk.com/id827289046",
 } as const;

@@ -124,13 +124,13 @@ export default function GamePlaySection({ project }: GamePlaySectionProps) {
 
       <div
         ref={gameRef}
-        className={`mt-5 overflow-hidden rounded-2xl border border-white/15 bg-[#141424] shadow-[0_18px_35px_rgba(0,0,0,0.35)] ${
+        className={`${isFullscreen ? "" : "mt-5"} overflow-hidden rounded-2xl border border-white/15 bg-[#141424] shadow-[0_18px_35px_rgba(0,0,0,0.35)] ${
           isFullscreen ? "rounded-none border-0" : ""
         }`}
       >
         <div
           className={`relative w-full bg-black ${
-            isFullscreen ? "min-h-screen" : "aspect-video"
+            isFullscreen ? "h-screen" : "aspect-video"
           }`}
         >
           {loadState === "loading" ? (
@@ -153,7 +153,7 @@ export default function GamePlaySection({ project }: GamePlaySectionProps) {
 
           <iframe
             allow="fullscreen"
-            className={`h-full w-full border-0 ${
+            className={`absolute inset-0 h-full w-full border-0 ${
               loadState === "ready" ? "block" : "hidden"
             }`}
             onError={() => setLoadState("error")}
