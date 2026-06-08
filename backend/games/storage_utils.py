@@ -32,14 +32,17 @@ def _normalize_extracted_root(build_root: Path) -> Path:
 def delete_build_files(project_id: int) -> None:
     prefix = f"games/{project_id}/"
     if hasattr(default_storage, "bucket"):
-        bucket = default_storage.bucket
-        response = bucket.meta.client.list_objects_v2(
-            Bucket=bucket.name,
-            Prefix=prefix,
-        )
-        objects = [{"Key": item["Key"]} for item in response.get("Contents", [])]
-        if objects:
-            bucket.delete_objects(Delete={"Objects": objects})
+        try:
+            bucket = default_storage.bucket
+            response = bucket.meta.client.list_objects_v2(
+                Bucket=bucket.name,
+                Prefix=prefix,
+            )
+            objects = [{"Key": item["Key"]} for item in response.get("Contents", [])]
+            if objects:
+                bucket.delete_objects(Delete={"Objects": objects})
+        except Exception:
+            pass
         return
 
     build_root = Path(settings.MEDIA_ROOT) / "games" / str(project_id)

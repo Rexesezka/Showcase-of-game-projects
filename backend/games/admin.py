@@ -5,6 +5,9 @@ from django.core.exceptions import ValidationError
 from .models import Application, Media, Project, ProjectArtifact, Season, TeamMember
 from .storage_utils import extract_build_archive
 
+
+def _is_storage_error(exc: BaseException) -> bool:
+    return type(exc).__name__ in {"ClientError", "BotoCoreError"}
 @admin.register(Season)
 class SeasonAdmin(admin.ModelAdmin):
     list_display = ("name", "start_date", "end_date", "status")
@@ -121,7 +124,12 @@ class ProjectAdmin(admin.ModelAdmin):
     )
 
     def save_model(self, request, obj, form, change):
-        super().save_model(request, obj, form, change)
+        try:
+            super().save_model(request, obj, form, change)
+        except Exception as exc:
+            if _is_storage_error(exc):
+                raise ValidationError(f"Ошибка загрузки файла в хранилище: {exc}") from exc
+            raise
 
         archive = obj.build_archive
         if not archive:
@@ -129,11 +137,13 @@ class ProjectAdmin(admin.ModelAdmin):
 
         try:
             obj.build_url = extract_build_archive(archive, obj.id)
+            obj.save(update_fields=["build_url"])
         except ValueError as exc:
-            raise ValidationError(str(exc)) from exc
-
-        obj.save(update_fields=["build_url"])
-
+            raise ValidationError(f"Ошибка распаковки билда: {exc}") from exc
+        except Exception as exc:
+            if _is_storage_error(exc):
+                raise ValidationError(f"Ошибка загрузки билда в хранилище: {exc}") from exc
+            raise
 @admin.register(Application)
 class ApplicationAdmin(admin.ModelAdmin):
     list_display = (

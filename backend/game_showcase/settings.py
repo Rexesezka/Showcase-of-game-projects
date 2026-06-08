@@ -4,6 +4,7 @@ Django settings for game_showcase project.
 
 from pathlib import Path
 import os
+import re
 
 import dj_database_url
 
@@ -21,6 +22,18 @@ def _env_bool(name: str, default: bool = False) -> bool:
 def _env_list(name: str, default: str = "") -> list[str]:
     raw = os.environ.get(name, default)
     return [item.strip() for item in raw.split(",") if item.strip()]
+
+
+def _s3_region_name(endpoint_url: str | None, explicit_region: str | None) -> str:
+    if explicit_region and explicit_region != "auto":
+        return explicit_region
+
+    if endpoint_url:
+        match = re.search(r"s3\.([^.]+)\.backblazeb2\.com", endpoint_url)
+        if match:
+            return match.group(1)
+
+    return explicit_region or "auto"
 
 
 # Quick-start development settings - unsuitable for production
@@ -148,14 +161,23 @@ MEDIA_ROOT = BASE_DIR / 'media'
 USE_S3_MEDIA = _env_bool("USE_S3_MEDIA", False)
 
 if USE_S3_MEDIA:
+    from botocore.config import Config
+
     AWS_ACCESS_KEY_ID = os.environ["AWS_ACCESS_KEY_ID"]
     AWS_SECRET_ACCESS_KEY = os.environ["AWS_SECRET_ACCESS_KEY"]
     AWS_STORAGE_BUCKET_NAME = os.environ["AWS_STORAGE_BUCKET_NAME"]
     AWS_S3_ENDPOINT_URL = os.environ.get("AWS_S3_ENDPOINT_URL")
     AWS_S3_CUSTOM_DOMAIN = os.environ.get("AWS_S3_CUSTOM_DOMAIN")
-    AWS_S3_REGION_NAME = os.environ.get("AWS_S3_REGION_NAME", "auto")
+    AWS_S3_REGION_NAME = _s3_region_name(
+        AWS_S3_ENDPOINT_URL,
+        os.environ.get("AWS_S3_REGION_NAME"),
+    )
     AWS_DEFAULT_ACL = None
     AWS_S3_FILE_OVERWRITE = True
+    AWS_S3_CLIENT_CONFIG = Config(
+        request_checksum_calculation="when_required",
+        response_checksum_validation="when_required",
+    )
 
     # Без CUSTOM_DOMAIN — приватный bucket, файлы отдаются через Render (/media/...).
     S3_PROXY_MEDIA = _env_bool("S3_PROXY_MEDIA", not bool(AWS_S3_CUSTOM_DOMAIN))
@@ -179,6 +201,7 @@ if USE_S3_MEDIA:
             "default_acl": AWS_DEFAULT_ACL,
             "querystring_auth": AWS_QUERYSTRING_AUTH,
             "file_overwrite": AWS_S3_FILE_OVERWRITE,
+            "client_config": AWS_S3_CLIENT_CONFIG,
         },
     }
 
