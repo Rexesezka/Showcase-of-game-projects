@@ -1,14 +1,9 @@
-import shutil
-import zipfile
-from pathlib import Path
-
 from django import forms
-from django.conf import settings
 from django.contrib import admin
 from django.core.exceptions import ValidationError
 
 from .models import Application, Media, Project, ProjectArtifact, Season, TeamMember
-
+from .storage_utils import extract_build_archive
 
 @admin.register(Season)
 class SeasonAdmin(admin.ModelAdmin):
@@ -132,39 +127,12 @@ class ProjectAdmin(admin.ModelAdmin):
         if not archive:
             return
 
-        build_root = Path(settings.MEDIA_ROOT) / "games" / str(obj.id)
-        if build_root.exists():
-            shutil.rmtree(build_root)
-        build_root.mkdir(parents=True, exist_ok=True)
-
-        archive_path = Path(archive.path)
         try:
-            with zipfile.ZipFile(archive_path, "r") as zip_ref:
-                zip_ref.extractall(build_root)
-        except zipfile.BadZipFile as exc:
-            raise ValidationError("Некорректный ZIP архив билда.") from exc
+            obj.build_url = extract_build_archive(archive, obj.id)
+        except ValueError as exc:
+            raise ValidationError(str(exc)) from exc
 
-        index_path = build_root / "index.html"
-        if not index_path.exists():
-            found_index = next(build_root.rglob("index.html"), None)
-            if found_index:
-                nested_root = found_index.parent
-                for item in nested_root.iterdir():
-                    destination = build_root / item.name
-                    if destination.exists():
-                        if destination.is_dir():
-                            shutil.rmtree(destination)
-                        else:
-                            destination.unlink()
-                    shutil.move(str(item), str(destination))
-            index_path = build_root / "index.html"
-
-        if not index_path.exists():
-            raise ValidationError("В архиве не найден index.html (Unity WebGL билд).")
-
-        obj.build_url = f"{settings.MEDIA_URL}games/{obj.id}/index.html"
         obj.save(update_fields=["build_url"])
-
 
 @admin.register(Application)
 class ApplicationAdmin(admin.ModelAdmin):
