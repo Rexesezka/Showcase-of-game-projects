@@ -87,6 +87,6 @@ def extract_build_archive(archive_file, project_id: int) -> str:
         upload_directory_to_storage(build_root, storage_prefix)
         if build_root.exists():
             shutil.rmtree(build_root)
-        return default_storage.url(f"{storage_prefix}index.html")
+        return f"{settings.MEDIA_URL}games/{project_id}/index.html"
 
     return f"{settings.MEDIA_URL}games/{project_id}/index.html"

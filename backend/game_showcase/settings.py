@@ -155,17 +155,26 @@ if USE_S3_MEDIA:
     AWS_S3_CUSTOM_DOMAIN = os.environ.get("AWS_S3_CUSTOM_DOMAIN")
     AWS_S3_REGION_NAME = os.environ.get("AWS_S3_REGION_NAME", "auto")
     AWS_DEFAULT_ACL = None
-    AWS_QUERYSTRING_AUTH = False
     AWS_S3_FILE_OVERWRITE = True
 
+    # Без CUSTOM_DOMAIN — приватный bucket, файлы отдаются через Render (/media/...).
+    S3_PROXY_MEDIA = _env_bool("S3_PROXY_MEDIA", not bool(AWS_S3_CUSTOM_DOMAIN))
+    AWS_QUERYSTRING_AUTH = not S3_PROXY_MEDIA
+
+    storage_backend = (
+        "games.storage_backends.ProxyS3Storage"
+        if S3_PROXY_MEDIA
+        else "storages.backends.s3.S3Storage"
+    )
+
     STORAGES["default"] = {
-        "BACKEND": "storages.backends.s3.S3Storage",
+        "BACKEND": storage_backend,
         "OPTIONS": {
             "bucket_name": AWS_STORAGE_BUCKET_NAME,
             "access_key": AWS_ACCESS_KEY_ID,
             "secret_key": AWS_SECRET_ACCESS_KEY,
             "endpoint_url": AWS_S3_ENDPOINT_URL,
-            "custom_domain": AWS_S3_CUSTOM_DOMAIN,
+            "custom_domain": AWS_S3_CUSTOM_DOMAIN or None,
             "region_name": AWS_S3_REGION_NAME,
             "default_acl": AWS_DEFAULT_ACL,
             "querystring_auth": AWS_QUERYSTRING_AUTH,
@@ -173,7 +182,7 @@ if USE_S3_MEDIA:
         },
     }
 
-    if AWS_S3_CUSTOM_DOMAIN:
+    if AWS_S3_CUSTOM_DOMAIN and not S3_PROXY_MEDIA:
         MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
 
 # Default primary key field type
