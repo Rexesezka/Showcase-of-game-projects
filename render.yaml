@@ -27,6 +27,10 @@ services:
         sync: false
       - key: USE_S3_MEDIA
         sync: false
+      - key: AWS_REQUEST_CHECKSUM_CALCULATION
+        value: when_required
+      - key: AWS_RESPONSE_CHECKSUM_VALIDATION
+        value: when_required
       - key: AWS_ACCESS_KEY_ID
         sync: false
       - key: AWS_SECRET_ACCESS_KEY

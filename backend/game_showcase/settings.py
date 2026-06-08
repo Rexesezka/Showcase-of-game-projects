@@ -6,6 +6,11 @@ from pathlib import Path
 import os
 import re
 
+# Backblaze B2 не поддерживает checksum-заголовки нового boto3.
+if os.environ.get("USE_S3_MEDIA", "").strip().lower() in {"1", "true", "yes", "on"}:
+    os.environ.setdefault("AWS_REQUEST_CHECKSUM_CALCULATION", "when_required")
+    os.environ.setdefault("AWS_RESPONSE_CHECKSUM_VALIDATION", "when_required")
+
 import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -189,20 +194,24 @@ if USE_S3_MEDIA:
         else "storages.backends.s3.S3Storage"
     )
 
+    s3_options = {
+        "bucket_name": AWS_STORAGE_BUCKET_NAME,
+        "access_key": AWS_ACCESS_KEY_ID,
+        "secret_key": AWS_SECRET_ACCESS_KEY,
+        "endpoint_url": AWS_S3_ENDPOINT_URL,
+        "region_name": AWS_S3_REGION_NAME,
+        "default_acl": AWS_DEFAULT_ACL,
+        "querystring_auth": AWS_QUERYSTRING_AUTH,
+        "file_overwrite": AWS_S3_FILE_OVERWRITE,
+        "client_config": AWS_S3_CLIENT_CONFIG,
+        "addressing_style": "virtual",
+    }
+    if AWS_S3_CUSTOM_DOMAIN:
+        s3_options["custom_domain"] = AWS_S3_CUSTOM_DOMAIN
+
     STORAGES["default"] = {
         "BACKEND": storage_backend,
-        "OPTIONS": {
-            "bucket_name": AWS_STORAGE_BUCKET_NAME,
-            "access_key": AWS_ACCESS_KEY_ID,
-            "secret_key": AWS_SECRET_ACCESS_KEY,
-            "endpoint_url": AWS_S3_ENDPOINT_URL,
-            "custom_domain": AWS_S3_CUSTOM_DOMAIN or None,
-            "region_name": AWS_S3_REGION_NAME,
-            "default_acl": AWS_DEFAULT_ACL,
-            "querystring_auth": AWS_QUERYSTRING_AUTH,
-            "file_overwrite": AWS_S3_FILE_OVERWRITE,
-            "client_config": AWS_S3_CLIENT_CONFIG,
-        },
+        "OPTIONS": s3_options,
     }
 
     if AWS_S3_CUSTOM_DOMAIN and not S3_PROXY_MEDIA:

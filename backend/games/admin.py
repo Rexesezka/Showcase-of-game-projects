@@ -1,13 +1,18 @@
 from django import forms
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.core.exceptions import ValidationError
+from django.http import HttpResponseRedirect
 
 from .models import Application, Media, Project, ProjectArtifact, Season, TeamMember
 from .storage_utils import extract_build_archive
 
 
 def _is_storage_error(exc: BaseException) -> bool:
-    return type(exc).__name__ in {"ClientError", "BotoCoreError"}
+    name = type(exc).__name__
+    if name in {"ClientError", "BotoCoreError", "NoCredentialsError"}:
+        return True
+    message = str(exc).lower()
+    return "x-amz" in message or "backblaze" in message or "s3" in message and "error" in message
 @admin.register(Season)
 class SeasonAdmin(admin.ModelAdmin):
     list_display = ("name", "start_date", "end_date", "status")
@@ -122,6 +127,26 @@ class ProjectAdmin(admin.ModelAdmin):
             },
         ),
     )
+
+    def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
+        try:
+            return super().changeform_view(request, object_id, form_url, extra_context)
+        except Exception as exc:
+            if _is_storage_error(exc):
+                messages.error(
+                    request,
+                    f"Не удалось загрузить файл в Backblaze B2: {exc}",
+                )
+                return HttpResponseRedirect(request.path)
+            raise
+
+    def save_formsets(self, request, form, formsets, change):
+        try:
+            super().save_formsets(request, form, formsets, change)
+        except Exception as exc:
+            if _is_storage_error(exc):
+                raise ValidationError(f"Ошибка загрузки изображения: {exc}") from exc
+            raise
 
     def save_model(self, request, obj, form, change):
         try:

@@ -3,7 +3,7 @@ import zipfile
 from pathlib import Path
 
 from django.conf import settings
-from django.core.files.base import ContentFile
+from django.core.files.base import ContentFile, File
 from django.core.files.storage import default_storage
 
 
@@ -59,7 +59,7 @@ def upload_directory_to_storage(source_root: Path, storage_prefix: str) -> None:
         with file_path.open("rb") as file_obj:
             if default_storage.exists(storage_path):
                 default_storage.delete(storage_path)
-            default_storage.save(storage_path, ContentFile(file_obj.read()))
+            default_storage.save(storage_path, File(file_obj))
 
 
 def extract_build_archive(archive_file, project_id: int) -> str:
